@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Hub</title>
+    <title>Game Hub Cloud</title>
     <style>
-        /* General styles */
         body {
             margin: 0;
             padding: 0;
@@ -14,7 +13,6 @@
             color: #c9d1d9; /* Light text */
         }
 
-        /* Header */
         header {
             background-color: #161b22;
             padding: 20px;
@@ -28,7 +26,6 @@
             margin: 0;
         }
 
-        /* Navigation menu */
         nav {
             display: flex;
             justify-content: center;
@@ -51,7 +48,6 @@
             color: #0d1117;
         }
 
-        /* Game categories */
         .container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -101,7 +97,6 @@
             background-color: #2ea043;
         }
 
-        /* Footer */
         footer {
             background-color: #161b22;
             padding: 10px;
@@ -109,56 +104,174 @@
             color: #8b949e;
             margin-top: 20px;
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header>
-        <h1>Game Hub</h1>
+        <h1>Game Hub Cloud</h1>
     </header>
 
-    <!-- Navigation Menu -->
     <nav>
-        <a href="#steam">Steam</a>
-        <a href="#epic">Epic Games</a>
-        <a href="#retro">Retro Games</a>
-        <a href="#indie">Indie Games</a>
+        <a href="#xbox">Xbox Cloud</a>
+        <a href="#geforce">GeForce NOW</a>
+        <a href="#stadia">Google Stadia</a>
     </nav>
 
-    <!-- Game Categories -->
-    <div class="container">
-        <!-- Steam Games -->
-        <div class="category" id="steam">
-            <img src="https://via.placeholder.com/250x150" alt="Steam Game">
-            <h2>Steam Game</h2>
-            <button onclick="window.open('steam://rungameid/12345')">Play</button>
-        </div>
+    <div class="container" id="gameContainer">
+        <!-- Dynamic game categories will be loaded here -->
+    </div>
 
-        <!-- Epic Games -->
-        <div class="category" id="epic">
-            <img src="https://via.placeholder.com/250x150" alt="Epic Game">
-            <h2>Epic Game</h2>
-            <button onclick="window.open('https://store.epicgames.com')">Play</button>
-        </div>
-
-        <!-- Retro Games -->
-        <div class="category" id="retro">
-            <img src="https://via.placeholder.com/250x150" alt="Retro Game">
-            <h2>Retro Game</h2>
-            <button onclick="window.open('https://retroarch.com')">Play</button>
-        </div>
-
-        <!-- Indie Games -->
-        <div class="category" id="indie">
-            <img src="https://via.placeholder.com/250x150" alt="Indie Game">
-            <h2>Indie Game</h2>
-            <button onclick="window.open('https://itch.io')">Play</button>
+    <!-- Modal for adding a new game -->
+    <div id="addGameModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Add a New Game</h2>
+            <label for="gameTitle">Game Title:</label>
+            <input type="text" id="gameTitle" placeholder="Enter game title">
+            <label for="gameUrl">Game URL:</label>
+            <input type="url" id="gameUrl" placeholder="Enter game link (e.g. xCloud)">
+            <button onclick="addGame()">Add Game</button>
         </div>
     </div>
 
-    <!-- Footer -->
+    <button style="margin: 20px" onclick="openModal()">Add New Game</button>
+
     <footer>
-        <p>© 2025 Game Hub | Designed for Cloud Gaming</p>
+        <p>© 2025 Game Hub Cloud | Cloud Gaming Simplified</p>
     </footer>
+
+    <script>
+        // Load games from localStorage
+        window.onload = function() {
+            loadGames();
+        };
+
+        // Open the modal
+        function openModal() {
+            document.getElementById("addGameModal").style.display = "block";
+        }
+
+        // Close the modal
+        function closeModal() {
+            document.getElementById("addGameModal").style.display = "none";
+        }
+
+        // Add a new game
+        function addGame() {
+            const title = document.getElementById("gameTitle").value;
+            const url = document.getElementById("gameUrl").value;
+
+            if (title && url) {
+                const games = JSON.parse(localStorage.getItem("games")) || [];
+                games.push({ title, url });
+                localStorage.setItem("games", JSON.stringify(games));
+                loadGames();
+                closeModal();
+            } else {
+                alert("Please enter both title and URL!");
+            }
+        }
+
+        // Load games from localStorage and display them
+        function loadGames() {
+            const games = JSON.parse(localStorage.getItem("games")) || [];
+            const container = document.getElementById("gameContainer");
+            container.innerHTML = ""; // Clear the container
+
+            games.forEach((game, index) => {
+                const gameElement = document.createElement("div");
+                gameElement.className = "category";
+
+                gameElement.innerHTML = `
+                    <h2>${game.title}</h2>
+                    <button onclick="window.open('${game.url}')">Play Now</button>
+                    <button onclick="editGame(${index})">Edit</button>
+                    <button onclick="deleteGame(${index})">Delete</button>
+                `;
+
+                container.appendChild(gameElement);
+            });
+        }
+
+        // Edit a game
+        function editGame(index) {
+            const games = JSON.parse(localStorage.getItem("games")) || [];
+            const game = games[index];
+
+            document.getElementById("gameTitle").value = game.title;
+            document.getElementById("gameUrl").value = game.url;
+            openModal();
+
+            // Modify the add button to update the game
+            document.querySelector("button[onclick='addGame()']").innerText = "Update Game";
+            document.querySelector("button[onclick='addGame()']").onclick = function() {
+                updateGame(index);
+            };
+        }
+
+        // Update a game
+        function updateGame(index) {
+            const title = document.getElementById("gameTitle").value;
+            const url = document.getElementById("gameUrl").value;
+
+            const games = JSON.parse(localStorage.getItem("games")) || [];
+            games[index] = { title, url };
+            localStorage.setItem("games", JSON.stringify(games));
+            loadGames();
+            closeModal();
+        }
+
+        // Delete a game
+        function deleteGame(index) {
+            const games = JSON.parse(localStorage.getItem("games")) || [];
+            games.splice(index, 1);
+            localStorage.setItem("games", JSON.stringify(games));
+            loadGames();
+        }
+    </script>
 </body>
 </html>

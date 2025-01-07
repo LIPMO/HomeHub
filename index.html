@@ -176,10 +176,9 @@
             margin: 0;
         }
 
-        /* Style spécifique pour les boutons Play et Delete */
         .btn-play {
             background-color: var(--play-btn-color);
-            border-radius: var(--border-radius); /* Coins arrondis */
+            border-radius: var(--border-radius);
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
@@ -190,7 +189,7 @@
 
         .btn-delete {
             background-color: var(--delete-btn-color);
-            border-radius: var(--border-radius); /* Coins arrondis */
+            border-radius: var(--border-radius);
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
@@ -250,27 +249,25 @@
     </div>
 
     <script>
+        let games = []; // Exemple de données de jeux
+
+        // Fonction pour rechercher les jeux
+        function searchGames() {
+            const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+            const filteredGames = games.filter(game => {
+                return game.title.toLowerCase().includes(searchTerm) || 
+                       game.genre.toLowerCase().includes(searchTerm) ||
+                       game.platform.toLowerCase().includes(searchTerm);
+            });
+            renderGames(filteredGames);
+        }
+
         function openAddGameModal() {
             document.getElementById("addGameModal").style.display = "block";
         }
 
         function closeAddGameModal() {
             document.getElementById("addGameModal").style.display = "none";
-        }
-
-        function playGame(index) {
-            const game = games[index];
-            window.open(game.url);
-        }
-
-        function deleteGame(index) {
-            games.splice(index, 1);
-            saveGames();
-            renderGames();
-        }
-
-        function saveGames() {
-            localStorage.setItem("games", JSON.stringify(games));
         }
 
         function addNewGame() {
@@ -285,25 +282,27 @@
                 const newGame = { title, imageUrl, url, genre, platform, rating };
                 games.push(newGame);
                 saveGames();
-                renderGames();
+                renderGames(games);
                 closeAddGameModal();
             } else {
                 alert("Please fill in all fields.");
             }
         }
 
-        function clearAllGames() {
-            if (confirm("Are you sure you want to clear all games?")) {
-                games = [];
-                saveGames();
-                renderGames();
-            }
+        function deleteGame(index) {
+            games.splice(index, 1);
+            saveGames();
+            renderGames(games);
         }
 
-        function renderGames() {
+        function saveGames() {
+            localStorage.setItem("games", JSON.stringify(games));
+        }
+
+        function renderGames(filteredGames) {
             const container = document.getElementById("gameContainer");
             container.innerHTML = "";
-            games.forEach((game, index) => {
+            filteredGames.forEach((game, index) => {
                 const gameCard = document.createElement("div");
                 gameCard.classList.add("game-card");
                 gameCard.innerHTML = `
@@ -321,10 +320,9 @@
 
         function loadGames() {
             games = JSON.parse(localStorage.getItem("games")) || [];
-            renderGames();
+            renderGames(games);
         }
 
-        let games = []; // Exemple de données de jeux
         loadGames();
     </script>
 </body>

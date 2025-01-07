@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
- <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-    
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
     <title>LipmoHub</title>
     <style>
         :root {
@@ -201,7 +199,6 @@
     </style>
 </head>
 <body>
-    <!-- Content page -->
     <div id="contentPage">
         <header>
             <h1>LipmoHub</h1>
@@ -213,9 +210,7 @@
             <input type="text" id="searchInput" placeholder="Search games..." onkeyup="searchGames()">
         </div>
 
-        <div id="gameContainer" class="game-container">
-            <!-- Game cards dynamically added here -->
-        </div>
+        <div id="gameContainer" class="game-container"></div>
 
         <!-- Modal pour ajouter un jeu -->
         <div id="addGameModal" class="add-game-modal">
@@ -253,7 +248,14 @@
     </div>
 
     <script>
-        // Fonction de lecture et suppression des jeux
+        function openAddGameModal() {
+            document.getElementById("addGameModal").style.display = "block";
+        }
+
+        function closeAddGameModal() {
+            document.getElementById("addGameModal").style.display = "none";
+        }
+
         function playGame(index) {
             const game = games[index];
             window.open(game.url);
@@ -278,14 +280,7 @@
             const rating = document.getElementById("gameRating").value;
 
             if (title && imageUrl && url) {
-                const newGame = {
-                    title, 
-                    imageUrl, 
-                    url, 
-                    genre, 
-                    platform, 
-                    rating
-                };
+                const newGame = { title, imageUrl, url, genre, platform, rating };
                 games.push(newGame);
                 saveGames();
                 renderGames();
@@ -293,10 +288,6 @@
             } else {
                 alert("Please fill in all fields.");
             }
-        }
-
-        function closeAddGameModal() {
-            document.getElementById("addGameModal").style.display = "none";
         }
 
         function clearAllGames() {
@@ -307,7 +298,6 @@
             }
         }
 
-        // Rendre les jeux sur la page
         function renderGames() {
             const container = document.getElementById("gameContainer");
             container.innerHTML = "";
@@ -327,7 +317,6 @@
             });
         }
 
-        // Charger les jeux depuis le localStorage
         function loadGames() {
             games = JSON.parse(localStorage.getItem("games")) || [];
             renderGames();

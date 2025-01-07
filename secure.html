@@ -8,6 +8,7 @@
         :root {
             --primary-color: #00bfff;
             --secondary-color: #00aaff;
+            --accent-color: #ff6347;
             --dark-background: #121212;
             --light-background: #f4f4f4;
             --card-background: #2c2c2c;
@@ -15,6 +16,8 @@
             --hover-color: #0088cc;
             --font-family: 'Arial', sans-serif;
             --button-padding: 0.8rem 1.5rem;
+            --delete-btn-color: #e74c3c;
+            --play-btn-color: #2ecc71;
         }
 
         body {
@@ -214,6 +217,26 @@
             background-color: var(--hover-color);
         }
 
+        /* Style spécifique pour les boutons Play et Delete */
+        .btn-play {
+            background-color: var(--play-btn-color);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-play:hover {
+            background-color: #27ae60;
+            transform: translateY(-4px);
+        }
+
+        .btn-delete {
+            background-color: var(--delete-btn-color);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+            transform: translateY(-4px);
+        }
     </style>
 </head>
 <body>
@@ -305,8 +328,8 @@
                     <p>Genre: ${game.genre}</p>
                     <p>Platform: ${game.platform}</p>
                     <p>Rating: ${game.rating}</p>
-                    <button class="btn" onclick="playGame(${index})">Play</button>
-                    <button class="btn" onclick="deleteGame(${index})">Delete</button>
+                    <button class="btn btn-play" onclick="playGame(${index})">Play</button>
+                    <button class="btn btn-delete" onclick="deleteGame(${index})">Delete</button>
                 `;
                 container.appendChild(gameCard);
             });

@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+ <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    
     <title>Game Hub Cloud</title>
     <style>
         :root {
             --primary-color: #00bfff;
             --secondary-color: #00aaff;
+            --accent-color: #ff6347;
             --dark-background: #121212;
             --light-background: #f4f4f4;
             --card-background: #2c2c2c;
@@ -15,6 +19,8 @@
             --hover-color: #0088cc;
             --font-family: 'Arial', sans-serif;
             --button-padding: 0.8rem 1.5rem;
+            --delete-btn-color: #e74c3c;
+            --play-btn-color: #2ecc71;
         }
 
         body {
@@ -171,73 +177,98 @@
         footer p {
             margin: 0;
         }
+
+        /* Style spécifique pour les boutons Play et Delete */
+        .btn-play {
+            background-color: var(--play-btn-color);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-play:hover {
+            background-color: #27ae60;
+            transform: translateY(-4px);
+        }
+
+        .btn-delete {
+            background-color: var(--delete-btn-color);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+            transform: translateY(-4px);
+        }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Game Hub Cloud</h1>
-        <button class="btn" onclick="openAddGameModal()">Add Game</button>
-        <button class="btn" onclick="clearAllGames()">Clear All Games</button>
-    </header>
+    <!-- Content page -->
+    <div id="contentPage">
+        <header>
+            <h1>Game Hub Cloud</h1>
+            <button class="btn" onclick="openAddGameModal()">Add Game</button>
+            <button class="btn" onclick="clearAllGames()">Clear All Games</button>
+        </header>
 
-    <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Search games..." onkeyup="searchGames()">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search games..." onkeyup="searchGames()">
+        </div>
+
+        <div id="gameContainer" class="game-container">
+            <!-- Game cards dynamically added here -->
+        </div>
+
+        <!-- Modal pour ajouter un jeu -->
+        <div id="addGameModal" class="add-game-modal">
+            <h2>Add a Game</h2>
+            <label for="gameTitle">Game Title:</label>
+            <input type="text" id="gameTitle" placeholder="Enter game title">
+            
+            <label for="gameImageUrl">Game Image URL:</label>
+            <input type="text" id="gameImageUrl" placeholder="Enter game image URL">
+            
+            <label for="gameUrl">Game URL:</label>
+            <input type="text" id="gameUrl" placeholder="Enter game URL">
+            
+            <label for="gameGenre">Genre:</label>
+            <input type="text" id="gameGenre" placeholder="Enter genre (e.g., Action, RPG)">
+            
+            <label for="gamePlatform">Platform:</label>
+            <select id="gamePlatform">
+                <option value="PC">PC</option>
+                <option value="Xbox">Xbox</option>
+                <option value="PlayStation">PlayStation</option>
+                <option value="Switch">Switch</option>
+            </select>
+
+            <label for="gameRating">Rating:</label>
+            <input type="number" id="gameRating" min="1" max="5" placeholder="Rating (1-5)">
+            
+            <button class="btn" onclick="addNewGame()">Add Game</button>
+            <button class="btn" onclick="closeAddGameModal()">Close</button>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Game Hub Cloud</p>
+        </footer>
     </div>
-
-    <div id="gameContainer" class="game-container">
-        <!-- Game cards dynamically added here -->
-    </div>
-
-    <!-- Modal pour ajouter un jeu -->
-    <div id="addGameModal" class="add-game-modal">
-        <h2>Add a Game</h2>
-        <label for="gameTitle">Game Title:</label>
-        <input type="text" id="gameTitle" placeholder="Enter game title">
-        
-        <label for="gameImageUrl">Game Image URL:</label>
-        <input type="text" id="gameImageUrl" placeholder="Enter game image URL">
-        
-        <label for="gameUrl">Game URL:</label>
-        <input type="text" id="gameUrl" placeholder="Enter game URL">
-        
-        <label for="gameGenre">Genre:</label>
-        <input type="text" id="gameGenre" placeholder="Enter genre (e.g., Action, RPG)">
-        
-        <label for="gamePlatform">Platform:</label>
-        <select id="gamePlatform">
-            <option value="PC">PC</option>
-            <option value="Xbox">Xbox</option>
-            <option value="PlayStation">PlayStation</option>
-            <option value="Switch">Switch</option>
-        </select>
-
-        <label for="gameRating">Rating:</label>
-        <input type="number" id="gameRating" min="1" max="5" placeholder="Rating (1-5)">
-        
-        <button class="btn" onclick="addNewGame()">Add Game</button>
-        <button class="btn" onclick="closeAddGameModal()">Close</button>
-    </div>
-
-    <footer>
-        <p>&copy; 2025 Game Hub Cloud</p>
-    </footer>
 
     <script>
-        // Variables globales
-        let games = [];
-        let isDarkMode = true;
-
-        // Ouvrir le modal pour ajouter un jeu
-        function openAddGameModal() {
-            document.getElementById("addGameModal").style.display = "block";
+        // Fonction de lecture et suppression des jeux
+        function playGame(index) {
+            const game = games[index];
+            window.open(game.url);
         }
 
-        // Fermer le modal pour ajouter un jeu
-        function closeAddGameModal() {
-            document.getElementById("addGameModal").style.display = "none";
+        function deleteGame(index) {
+            games.splice(index, 1);
+            saveGames();
+            renderGames();
         }
 
-        // Ajouter un nouveau jeu
+        function saveGames() {
+            localStorage.setItem("games", JSON.stringify(games));
+        }
+
         function addNewGame() {
             const title = document.getElementById("gameTitle").value;
             const imageUrl = document.getElementById("gameImageUrl").value;
@@ -264,15 +295,16 @@
             }
         }
 
-        // Sauvegarder les jeux dans le localStorage
-        function saveGames() {
-            localStorage.setItem("games", JSON.stringify(games));
+        function closeAddGameModal() {
+            document.getElementById("addGameModal").style.display = "none";
         }
 
-        // Charger les jeux depuis le localStorage
-        function loadGames() {
-            games = JSON.parse(localStorage.getItem("games")) || [];
-            renderGames();
+        function clearAllGames() {
+            if (confirm("Are you sure you want to clear all games?")) {
+                games = [];
+                saveGames();
+                renderGames();
+            }
         }
 
         // Rendre les jeux sur la page
@@ -288,63 +320,20 @@
                     <p>Genre: ${game.genre}</p>
                     <p>Platform: ${game.platform}</p>
                     <p>Rating: ${game.rating}</p>
-                    <button class="btn" onclick="playGame(${index})">Play</button>
-                    <button class="btn" onclick="deleteGame(${index})">Delete</button>
+                    <button class="btn btn-play" onclick="playGame(${index})">Play</button>
+                    <button class="btn btn-delete" onclick="deleteGame(${index})">Delete</button>
                 `;
                 container.appendChild(gameCard);
             });
         }
 
-        // Fonction pour jouer à un jeu
-        function playGame(index) {
-            const game = games[index];
-            window.open(game.url);
-        }
-
-        // Fonction pour supprimer un jeu
-        function deleteGame(index) {
-            games.splice(index, 1);
-            saveGames();
+        // Charger les jeux depuis le localStorage
+        function loadGames() {
+            games = JSON.parse(localStorage.getItem("games")) || [];
             renderGames();
         }
 
-        // Recherche de jeux par titre
-        function searchGames() {
-            const query = document.getElementById("searchInput").value.toLowerCase();
-            const filteredGames = games.filter(game => game.title.toLowerCase().includes(query));
-            renderFilteredGames(filteredGames);
-        }
-
-        // Fonction pour afficher les jeux filtrés
-        function renderFilteredGames(filteredGames) {
-            const container = document.getElementById("gameContainer");
-            container.innerHTML = "";
-            filteredGames.forEach((game, index) => {
-                const gameCard = document.createElement("div");
-                gameCard.classList.add("game-card");
-                gameCard.innerHTML = `
-                    <img src="${game.imageUrl}" alt="${game.title}">
-                    <h3>${game.title}</h3>
-                    <p>Genre: ${game.genre}</p>
-                    <p>Platform: ${game.platform}</p>
-                    <p>Rating: ${game.rating}</p>
-                    <button class="btn" onclick="playGame(${index})">Play</button>
-                    <button class="btn" onclick="deleteGame(${index})">Delete</button>
-                `;
-                container.appendChild(gameCard);
-            });
-        }
-
-        // Fonction pour effacer tous les jeux
-        function clearAllGames() {
-            if (confirm("Are you sure you want to clear all games?")) {
-                games = [];
-                saveGames();
-                renderGames();
-            }
-        }
-
-        // Charger les jeux à l'initialisation
+        let games = []; // Exemple de données de jeux
         loadGames();
     </script>
 </body>

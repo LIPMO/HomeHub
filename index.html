@@ -4,14 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Hub Cloud</title>
+    <script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vercel/analytics@0.1.0/dist/index.js"></script> <!-- Import de Vercel Analytics -->
+
     <style>
         :root {
             --primary-color: #00bfff;
+            --secondary-color: #00aaff;
             --dark-background: #121212;
             --light-background: #f4f4f4;
-            --secondary-background: #1e1e1e;
-            --button-hover-color: #0088cc;
+            --card-background: #2c2c2c;
+            --border-radius: 12px;
+            --hover-color: #0088cc;
             --font-family: 'Arial', sans-serif;
+            --button-padding: 0.8rem 1.5rem;
         }
 
         body {
@@ -23,61 +30,72 @@
         }
 
         header {
-            background-color: var(--secondary-background);
-            padding: 1.5rem;
+            background-color: var(--secondary-color);
+            padding: 2rem;
             text-align: center;
+            border-bottom: 2px solid var(--primary-color);
         }
 
         header h1 {
-            color: var(--primary-color);
-            font-size: 2rem;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
             margin-bottom: 1rem;
         }
 
         header .btn {
+            padding: var(--button-padding);
             margin: 0.5rem;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            color: white;
+            font-size: 1rem;
+        }
+
+        header .btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-4px);
         }
 
         .game-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
             padding: 2rem;
-            gap: 1.5rem;
         }
 
         .game-card {
-            background-color: #333;
-            padding: 1rem;
-            margin: 1rem;
-            border-radius: 10px;
-            width: 250px;
+            background-color: var(--card-background);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
 
         .game-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+            transform: translateY(-8px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
         }
 
         .game-card img {
             width: 100%;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             margin-bottom: 1rem;
         }
 
-        footer {
-            background-color: var(--secondary-background);
-            text-align: center;
-            padding: 1rem;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+        .game-card h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
         }
 
-        footer p {
-            font-size: 0.9rem;
+        .game-card p {
+            margin: 0.5rem 0;
+            color: #bbb;
         }
 
         .search-bar {
@@ -88,71 +106,74 @@
         .search-bar input {
             padding: 0.8rem;
             width: 80%;
+            max-width: 600px;
             border: 1px solid #333;
-            border-radius: 5px;
+            border-radius: var(--border-radius);
             font-size: 1rem;
+            background-color: #222;
+            color: white;
         }
 
-        .settings-modal {
+        .add-game-modal {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: var(--secondary-background);
-            padding: 1.5rem;
-            border-radius: 10px;
-            width: 320px;
+            background-color: var(--card-background);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            width: 350px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
         }
 
-        .settings-modal h2 {
+        .add-game-modal h2 {
             color: var(--primary-color);
             font-size: 1.5rem;
             margin-bottom: 1rem;
         }
 
-        .settings-modal input {
-            margin-bottom: 1rem;
+        .add-game-modal input {
             width: 100%;
             padding: 0.8rem;
-            border-radius: 5px;
+            margin-bottom: 1rem;
+            border-radius: var(--border-radius);
             border: 1px solid #333;
+            background-color: #222;
+            color: white;
             font-size: 1rem;
         }
 
-        .settings-modal button {
-            margin-top: 1rem;
-            padding: 0.8rem 1.5rem;
+        .add-game-modal button {
+            padding: 1rem 2rem;
             background-color: var(--primary-color);
             border: none;
-            border-radius: 5px;
+            border-radius: var(--border-radius);
             cursor: pointer;
             color: white;
-            transition: background-color 0.3s;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        .settings-modal button:hover {
-            background-color: var(--button-hover-color);
+        .add-game-modal button:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-4px);
         }
 
-        .btn {
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: var(--primary-color);
+        footer {
+            background-color: var(--secondary-color);
+            text-align: center;
+            padding: 1.5rem;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
             color: white;
-            transition: background-color 0.3s ease;
             font-size: 1rem;
         }
 
-        .btn:hover {
-            background-color: var(--button-hover-color);
-        }
-
-        button:focus {
-            outline: none;
+        footer p {
+            margin: 0;
         }
     </style>
 </head>
@@ -163,6 +184,7 @@
         <button class="btn" onclick="openSettings()">Settings</button>
         <button class="btn" onclick="clearAllGames()">Clear All Games</button>
         <button class="btn" onclick="showStats()">Show Stats</button>
+        <button class="btn" onclick="openAddGameModal()">Add Game</button> <!-- Nouveau bouton pour ajouter un jeu -->
     </header>
 
     <div class="search-bar">
@@ -173,19 +195,20 @@
         <!-- Game cards dynamically added here -->
     </div>
 
-    <div id="settingsModal" class="settings-modal">
-        <h2>Settings</h2>
-        <label for="username">Username:</label>
-        <input type="text" id="username" placeholder="Enter your username">
-
-        <label for="themeColor">Theme Color:</label>
-        <input type="color" id="themeColor">
-
-        <label for="itemsPerPage">Items per Page:</label>
-        <input type="number" id="itemsPerPage" min="1" max="100">
-
-        <button class="btn" onclick="saveSettings()">Save Settings</button>
-        <button class="btn" onclick="closeSettings()">Close</button>
+    <!-- Modal pour ajouter un jeu -->
+    <div id="addGameModal" class="add-game-modal">
+        <h2>Add a Game</h2>
+        <label for="gameTitle">Game Title:</label>
+        <input type="text" id="gameTitle" placeholder="Enter game title">
+        
+        <label for="gameImageUrl">Game Image URL:</label>
+        <input type="text" id="gameImageUrl" placeholder="Enter game image URL">
+        
+        <label for="gameUrl">Game URL:</label>
+        <input type="text" id="gameUrl" placeholder="Enter game URL">
+        
+        <button class="btn" onclick="addNewGame()">Add Game</button>
+        <button class="btn" onclick="closeAddGameModal()">Close</button>
     </div>
 
     <footer>
@@ -193,83 +216,59 @@
     </footer>
 
     <script>
+        // Importation de Vercel Analytics pour suivi de l'utilisation
+        import { Analytics } from "@vercel/analytics/react";
+        
         let games = [];
         let isDarkMode = true;
-        let settings = {
-            username: "",
-            themeColor: "#00bfff",
-            itemsPerPage: 10
-        };
 
-        // Load settings from localStorage
-        function loadSettings() {
-            const savedSettings = JSON.parse(localStorage.getItem("settings"));
-            if (savedSettings) {
-                settings = savedSettings;
-                applySettings();
+        // Fonction pour ouvrir le modal d'ajout de jeu
+        function openAddGameModal() {
+            document.getElementById("addGameModal").style.display = "block";
+        }
+
+        // Fonction pour fermer le modal d'ajout de jeu
+        function closeAddGameModal() {
+            document.getElementById("addGameModal").style.display = "none";
+        }
+
+        // Ajouter un jeu
+        function addNewGame() {
+            const title = document.getElementById("gameTitle").value;
+            const imageUrl = document.getElementById("gameImageUrl").value;
+            const url = document.getElementById("gameUrl").value;
+
+            if (title && imageUrl && url) {
+                const newGame = {
+                    title: title,
+                    imageUrl: imageUrl,
+                    url: url,
+                    favorite: false,
+                    plays: 0,
+                    lastPlayed: null
+                };
+
+                games.push(newGame);
+                saveGames();
+                renderGames();
+                closeAddGameModal();
+            } else {
+                alert("Please fill in all fields.");
             }
         }
 
-        // Save settings to localStorage
-        function saveSettings() {
-            const username = document.getElementById("username").value;
-            const themeColor = document.getElementById("themeColor").value;
-            const itemsPerPage = document.getElementById("itemsPerPage").value;
-
-            settings.username = username;
-            settings.themeColor = themeColor;
-            settings.itemsPerPage = parseInt(itemsPerPage, 10);
-
-            localStorage.setItem("settings", JSON.stringify(settings));
-            applySettings();
-            closeSettings();
-        }
-
-        // Apply settings to the page
-        function applySettings() {
-            document.body.style.color = settings.themeColor;
-            document.querySelectorAll(".btn").forEach(btn => btn.style.backgroundColor = settings.themeColor);
-        }
-
-        // Open settings modal
-        function openSettings() {
-            document.getElementById("username").value = settings.username;
-            document.getElementById("themeColor").value = settings.themeColor;
-            document.getElementById("itemsPerPage").value = settings.itemsPerPage;
-            document.getElementById("settingsModal").style.display = "block";
-        }
-
-        // Close settings modal
-        function closeSettings() {
-            document.getElementById("settingsModal").style.display = "none";
-        }
-
-        // Toggle light/dark theme
-        function toggleTheme() {
-            isDarkMode = !isDarkMode;
-            document.body.style.backgroundColor = isDarkMode ? "#121212" : "#f4f4f4";
-            document.body.style.color = isDarkMode ? "white" : "black";
-        }
-
-        // Add new game
-        function addGame(title, imageUrl, url) {
-            games.push({ title, imageUrl, url, favorite: false, plays: 0, lastPlayed: null });
-            saveGames();
-            renderGames();
-        }
-
-        // Save games to localStorage
+        // Sauvegarder les jeux dans le localStorage
         function saveGames() {
             localStorage.setItem("games", JSON.stringify(games));
         }
 
-        // Load games from localStorage
+        // Charger les jeux depuis le localStorage
         function loadGames() {
             games = JSON.parse(localStorage.getItem("games")) || [];
             renderGames();
         }
 
-        // Render game cards
+        // Rendre les jeux sur la page
         function renderGames() {
             const container = document.getElementById("gameContainer");
             container.innerHTML = "";
@@ -291,7 +290,7 @@
             });
         }
 
-        // Play a game
+        // Jouer à un jeu
         function playGame(index) {
             const game = games[index];
             game.plays += 1;
@@ -301,30 +300,14 @@
             window.open(game.url);
         }
 
-        // Delete a game
+        // Supprimer un jeu
         function deleteGame(index) {
             games.splice(index, 1);
             saveGames();
             renderGames();
         }
 
-        // Clear all games
-        function clearAllGames() {
-            if (confirm("Are you sure you want to clear all games?")) {
-                games = [];
-                saveGames();
-                renderGames();
-            }
-        }
-
-        // Toggle favorite
-        function toggleFavorite(index) {
-            games[index].favorite = !games[index].favorite;
-            saveGames();
-            renderGames();
-        }
-
-        // Search games
+        // Filtrer les jeux par recherche
         function searchGames() {
             const query = document.getElementById("searchInput").value.toLowerCase();
             const filteredGames = games.filter(game => game.title.toLowerCase().includes(query));
@@ -348,16 +331,27 @@
             });
         }
 
-        // Show stats
-        function showStats() {
-            const totalGames = games.length;
-            const totalPlays = games.reduce((total, game) => total + game.plays, 0);
-            alert(`Total games: ${totalGames}\nTotal plays: ${totalPlays}`);
+        // Fonction pour marquer un jeu comme favori
+        function toggleFavorite(index) {
+            games[index].favorite = !games[index].favorite;
+            saveGames();
+            renderGames();
         }
 
-        // Initialize app
-        loadSettings();
+        // Effacer tous les jeux
+        function clearAllGames() {
+            if (confirm("Are you sure you want to clear all games?")) {
+                games = [];
+                saveGames();
+                renderGames();
+            }
+        }
+
+        // Charger les jeux à l'initialisation
         loadGames();
     </script>
+
+    <!-- Insertion de l'analytics pour Vercel -->
+    <Analytics />
 </body>
 </html>

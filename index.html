@@ -178,7 +178,6 @@
 
         .btn-play {
             background-color: var(--play-btn-color);
-            border-radius: var(--border-radius);
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
@@ -189,7 +188,6 @@
 
         .btn-delete {
             background-color: var(--delete-btn-color);
-            border-radius: var(--border-radius);
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
@@ -204,14 +202,16 @@
         <header>
             <h1>LipmoHub</h1>
             <button class="btn" onclick="openAddGameModal()">Add Game</button>
-            <button class="btn" onclick="clearAllGames()">Clear All Games</button>
+            <button class="btn" onclick="confirmClearAllGames()">Clear All Games</button>
         </header>
 
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="Search games..." onkeyup="searchGames()">
         </div>
 
-        <div id="gameContainer" class="game-container"></div>
+        <div id="gameContainer" class="game-container">
+            <!-- Les jeux ajoutés dynamiquement ici -->
+        </div>
 
         <!-- Modal pour ajouter un jeu -->
         <div id="addGameModal" class="add-game-modal">
@@ -320,6 +320,19 @@
 
         function loadGames() {
             games = JSON.parse(localStorage.getItem("games")) || [];
+            renderGames(games);
+        }
+
+        function confirmClearAllGames() {
+            const confirmation = confirm("Are you sure you want to delete all games?");
+            if (confirmation) {
+                clearAllGames();
+            }
+        }
+
+        function clearAllGames() {
+            games = [];
+            saveGames();
             renderGames(games);
         }
 

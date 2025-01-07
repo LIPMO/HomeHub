@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Hub Cloud</title>
-    <script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.production.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@vercel/analytics@0.1.0/dist/index.js"></script> <!-- Import de Vercel Analytics -->
-
     <style>
         :root {
             --primary-color: #00bfff;
@@ -134,7 +130,7 @@
             margin-bottom: 1rem;
         }
 
-        .add-game-modal input {
+        .add-game-modal input, .add-game-modal select {
             width: 100%;
             padding: 0.8rem;
             margin-bottom: 1rem;
@@ -180,11 +176,8 @@
 <body>
     <header>
         <h1>Game Hub Cloud</h1>
-        <button class="btn" onclick="toggleTheme()">Toggle Theme</button>
-        <button class="btn" onclick="openSettings()">Settings</button>
+        <button class="btn" onclick="openAddGameModal()">Add Game</button>
         <button class="btn" onclick="clearAllGames()">Clear All Games</button>
-        <button class="btn" onclick="showStats()">Show Stats</button>
-        <button class="btn" onclick="openAddGameModal()">Add Game</button> <!-- Nouveau bouton pour ajouter un jeu -->
     </header>
 
     <div class="search-bar">
@@ -207,6 +200,20 @@
         <label for="gameUrl">Game URL:</label>
         <input type="text" id="gameUrl" placeholder="Enter game URL">
         
+        <label for="gameGenre">Genre:</label>
+        <input type="text" id="gameGenre" placeholder="Enter genre (e.g., Action, RPG)">
+        
+        <label for="gamePlatform">Platform:</label>
+        <select id="gamePlatform">
+            <option value="PC">PC</option>
+            <option value="Xbox">Xbox</option>
+            <option value="PlayStation">PlayStation</option>
+            <option value="Switch">Switch</option>
+        </select>
+
+        <label for="gameRating">Rating:</label>
+        <input type="number" id="gameRating" min="1" max="5" placeholder="Rating (1-5)">
+        
         <button class="btn" onclick="addNewGame()">Add Game</button>
         <button class="btn" onclick="closeAddGameModal()">Close</button>
     </div>
@@ -216,38 +223,38 @@
     </footer>
 
     <script>
-        // Importation de Vercel Analytics pour suivi de l'utilisation
-        import { Analytics } from "@vercel/analytics/react";
-        
+        // Variables globales
         let games = [];
         let isDarkMode = true;
 
-        // Fonction pour ouvrir le modal d'ajout de jeu
+        // Ouvrir le modal pour ajouter un jeu
         function openAddGameModal() {
             document.getElementById("addGameModal").style.display = "block";
         }
 
-        // Fonction pour fermer le modal d'ajout de jeu
+        // Fermer le modal pour ajouter un jeu
         function closeAddGameModal() {
             document.getElementById("addGameModal").style.display = "none";
         }
 
-        // Ajouter un jeu
+        // Ajouter un nouveau jeu
         function addNewGame() {
             const title = document.getElementById("gameTitle").value;
             const imageUrl = document.getElementById("gameImageUrl").value;
             const url = document.getElementById("gameUrl").value;
+            const genre = document.getElementById("gameGenre").value;
+            const platform = document.getElementById("gamePlatform").value;
+            const rating = document.getElementById("gameRating").value;
 
             if (title && imageUrl && url) {
                 const newGame = {
-                    title: title,
-                    imageUrl: imageUrl,
-                    url: url,
-                    favorite: false,
-                    plays: 0,
-                    lastPlayed: null
+                    title, 
+                    imageUrl, 
+                    url, 
+                    genre, 
+                    platform, 
+                    rating
                 };
-
                 games.push(newGame);
                 saveGames();
                 renderGames();
@@ -278,39 +285,38 @@
                 gameCard.innerHTML = `
                     <img src="${game.imageUrl}" alt="${game.title}">
                     <h3>${game.title}</h3>
-                    <p>Plays: ${game.plays}</p>
-                    <p>Last Played: ${game.lastPlayed ? new Date(game.lastPlayed).toLocaleString() : "Never"}</p>
+                    <p>Genre: ${game.genre}</p>
+                    <p>Platform: ${game.platform}</p>
+                    <p>Rating: ${game.rating}</p>
                     <button class="btn" onclick="playGame(${index})">Play</button>
-                    <button class="btn" onclick="toggleFavorite(${index})">
-                        ${game.favorite ? "Unfavorite" : "Favorite"}
-                    </button>
                     <button class="btn" onclick="deleteGame(${index})">Delete</button>
                 `;
                 container.appendChild(gameCard);
             });
         }
 
-        // Jouer à un jeu
+        // Fonction pour jouer à un jeu
         function playGame(index) {
             const game = games[index];
-            game.plays += 1;
-            game.lastPlayed = new Date().toISOString();
-            saveGames();
-            renderGames();
             window.open(game.url);
         }
 
-        // Supprimer un jeu
+        // Fonction pour supprimer un jeu
         function deleteGame(index) {
             games.splice(index, 1);
             saveGames();
             renderGames();
         }
 
-        // Filtrer les jeux par recherche
+        // Recherche de jeux par titre
         function searchGames() {
             const query = document.getElementById("searchInput").value.toLowerCase();
             const filteredGames = games.filter(game => game.title.toLowerCase().includes(query));
+            renderFilteredGames(filteredGames);
+        }
+
+        // Fonction pour afficher les jeux filtrés
+        function renderFilteredGames(filteredGames) {
             const container = document.getElementById("gameContainer");
             container.innerHTML = "";
             filteredGames.forEach((game, index) => {
@@ -319,26 +325,17 @@
                 gameCard.innerHTML = `
                     <img src="${game.imageUrl}" alt="${game.title}">
                     <h3>${game.title}</h3>
-                    <p>Plays: ${game.plays}</p>
-                    <p>Last Played: ${game.lastPlayed ? new Date(game.lastPlayed).toLocaleString() : "Never"}</p>
+                    <p>Genre: ${game.genre}</p>
+                    <p>Platform: ${game.platform}</p>
+                    <p>Rating: ${game.rating}</p>
                     <button class="btn" onclick="playGame(${index})">Play</button>
-                    <button class="btn" onclick="toggleFavorite(${index})">
-                        ${game.favorite ? "Unfavorite" : "Favorite"}
-                    </button>
                     <button class="btn" onclick="deleteGame(${index})">Delete</button>
                 `;
                 container.appendChild(gameCard);
             });
         }
 
-        // Fonction pour marquer un jeu comme favori
-        function toggleFavorite(index) {
-            games[index].favorite = !games[index].favorite;
-            saveGames();
-            renderGames();
-        }
-
-        // Effacer tous les jeux
+        // Fonction pour effacer tous les jeux
         function clearAllGames() {
             if (confirm("Are you sure you want to clear all games?")) {
                 games = [];
@@ -350,8 +347,5 @@
         // Charger les jeux à l'initialisation
         loadGames();
     </script>
-
-    <!-- Insertion de l'analytics pour Vercel -->
-    <Analytics />
 </body>
 </html>

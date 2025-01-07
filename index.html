@@ -5,273 +5,289 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Hub Cloud</title>
     <style>
-        /* Style global */
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
             background-color: #121212;
-            color: #fff;
+            color: white;
+            margin: 0;
         }
         header {
-            background-color: #1c1c1c;
+            background-color: #1e1e1e;
+            padding: 15px;
             text-align: center;
-            padding: 20px;
         }
         header h1 {
             color: #00bfff;
         }
-        .container {
+        .game-container {
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-evenly;
             padding: 20px;
         }
         .game-card {
             background-color: #333;
+            padding: 10px;
             margin: 10px;
-            padding: 20px;
-            width: 250px;
             border-radius: 10px;
-            text-align: center;
+            width: 200px;
         }
         .game-card img {
             width: 100%;
-            height: 150px;
             border-radius: 5px;
-        }
-        .game-card h3 {
-            color: #00bfff;
-        }
-        .button-container button {
-            background-color: #00bfff;
-            color: #fff;
-            border: none;
-            padding: 5px;
-            margin: 5px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .add-button {
-            background-color: #00bfff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            display: block;
-            margin: 20px auto;
-        }
-        .add-button:hover {
-            background-color: #008fb3;
         }
         footer {
+            background-color: #1e1e1e;
             text-align: center;
-            color: #888;
             padding: 10px;
             position: fixed;
             bottom: 0;
             width: 100%;
-            background-color: #1c1c1c;
         }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        .modal-content {
-            background-color: #333;
-            margin: 15% auto;
-            padding: 20px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 500px;
-        }
-        .modal input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            background-color: #444;
-            color: #fff;
+        .btn {
+            padding: 5px 10px;
+            margin: 5px;
             border: none;
             border-radius: 5px;
-        }
-        .modal input:focus {
-            outline: none;
-            border: 2px solid #00bfff;
-        }
-        .close {
-            color: #fff;
-            float: right;
-            font-size: 30px;
-            font-weight: bold;
             cursor: pointer;
+            background-color: #00bfff;
+            color: white;
         }
-        .close:hover {
-            color: #ff0000;
+        .search-bar {
+            margin: 20px;
+            text-align: center;
         }
-        /* Mode Sombre/Clair */
-        .light-mode {
-            background-color: #fff;
-            color: #121212;
+        .search-bar input {
+            padding: 10px;
+            width: 80%;
+            border: 1px solid #333;
+            border-radius: 5px;
         }
-        .light-mode header {
-            background-color: #f0f0f0;
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
-        .light-mode .game-card {
-            background-color: #f4f4f4;
-            color: #121212;
+        .settings-modal h2 {
+            color: #00bfff;
         }
-        .light-mode .button-container button {
-            background-color: #0077b3;
-        }
-        .light-mode .add-button {
-            background-color: #0077b3;
+        .settings-modal input {
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #333;
         }
     </style>
 </head>
 <body>
+    <header>
+        <h1>Game Hub Cloud</h1>
+        <button class="btn" onclick="toggleTheme()">Toggle Theme</button>
+        <button class="btn" onclick="openSettings()">Settings</button>
+        <button class="btn" onclick="clearAllGames()">Clear All Games</button>
+        <button class="btn" onclick="showStats()">Show Stats</button>
+    </header>
 
-<header>
-    <h1>Game Hub Cloud</h1>
-    <button onclick="toggleTheme()" class="add-button">Toggle Light/Dark Mode</button>
-</header>
-
-<!-- Contenu principal du hub de jeux -->
-<div id="gameContainer" class="container">
-    <!-- Les jeux seront générés ici -->
-</div>
-
-<!-- Bouton pour ajouter un jeu -->
-<button class="add-button" onclick="openModal()">Add New Game</button>
-
-<!-- Modal pour ajouter/modifier un jeu -->
-<div id="addGameModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2 id="modalTitle">Add a New Game</h2>
-        <input type="text" id="gameTitle" placeholder="Enter game title">
-        <input type="url" id="gameUrl" placeholder="Enter game link">
-        <input type="url" id="gameImage" placeholder="Enter game image URL">
-        <div class="button-container">
-            <button onclick="addOrUpdateGame()">Add Game</button>
-        </div>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search games..." onkeyup="searchGames()">
     </div>
-</div>
 
-<footer>
-    <p>© 2025 Game Hub Cloud</p>
-</footer>
+    <div id="gameContainer" class="game-container">
+        <!-- Game cards dynamically added here -->
+    </div>
 
-<script>
-    let games = JSON.parse(localStorage.getItem("games")) || [];
-    let currentIndex = -1; // Pour gérer l'édition d'un jeu
-    let isDarkMode = true; // Initialisation du mode sombre
+    <div id="settingsModal" class="settings-modal">
+        <h2>Settings</h2>
+        <label for="username">Username:</label>
+        <input type="text" id="username" placeholder="Enter your username">
 
-    // Fonction pour afficher les jeux
-    function loadGames() {
-        const container = document.getElementById("gameContainer");
-        container.innerHTML = ""; // Réinitialiser la liste des jeux
+        <label for="themeColor">Theme Color:</label>
+        <input type="color" id="themeColor">
 
-        games.forEach((game, index) => {
-            const gameElement = document.createElement("div");
-            gameElement.className = "game-card";
-            gameElement.innerHTML = `
-                <img src="${game.image}" alt="${game.title}">
-                <h3>${game.title}</h3>
-                <button onclick="window.open('${game.url}')">Play Now</button>
-                <div class="button-container">
-                    <button onclick="editGame(${index})">Edit</button>
-                    <button onclick="deleteGame(${index})">Delete</button>
-                    <button onclick="toggleFavorite(${index})">${game.favorite ? 'Unfavorite' : 'Favorite'}</button>
-                </div>
-            `;
-            container.appendChild(gameElement);
-        });
-    }
+        <label for="itemsPerPage">Items per Page:</label>
+        <input type="number" id="itemsPerPage" min="1" max="100">
 
-    // Fonction pour ajouter ou modifier un jeu
-    function addOrUpdateGame() {
-        const title = document.getElementById("gameTitle").value;
-        const url = document.getElementById("gameUrl").value;
-        const image = document.getElementById("gameImage").value;
+        <button class="btn" onclick="saveSettings()">Save Settings</button>
+        <button class="btn" onclick="closeSettings()">Close</button>
+    </div>
 
-        if (title && url && image) {
-            const game = { title, url, image, favorite: false };
+    <footer>
+        <p>&copy; 2025 Game Hub Cloud</p>
+    </footer>
 
-            if (currentIndex === -1) {
-                games.push(game); // Ajouter un jeu
-            } else {
-                games[currentIndex] = game; // Modifier un jeu existant
+    <script>
+        let games = [];
+        let isDarkMode = true;
+        let settings = {
+            username: "",
+            themeColor: "#00bfff",
+            itemsPerPage: 10
+        };
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const savedSettings = JSON.parse(localStorage.getItem("settings"));
+            if (savedSettings) {
+                settings = savedSettings;
+                applySettings();
             }
+        }
 
+        // Save settings to localStorage
+        function saveSettings() {
+            const username = document.getElementById("username").value;
+            const themeColor = document.getElementById("themeColor").value;
+            const itemsPerPage = document.getElementById("itemsPerPage").value;
+
+            settings.username = username;
+            settings.themeColor = themeColor;
+            settings.itemsPerPage = parseInt(itemsPerPage, 10);
+
+            localStorage.setItem("settings", JSON.stringify(settings));
+            applySettings();
+            closeSettings();
+        }
+
+        // Apply settings to the page
+        function applySettings() {
+            document.body.style.color = settings.themeColor;
+            document.querySelectorAll(".btn").forEach(btn => btn.style.backgroundColor = settings.themeColor);
+        }
+
+        // Open settings modal
+        function openSettings() {
+            document.getElementById("username").value = settings.username;
+            document.getElementById("themeColor").value = settings.themeColor;
+            document.getElementById("itemsPerPage").value = settings.itemsPerPage;
+            document.getElementById("settingsModal").style.display = "block";
+        }
+
+        // Close settings modal
+        function closeSettings() {
+            document.getElementById("settingsModal").style.display = "none";
+        }
+
+        // Toggle light/dark theme
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.style.backgroundColor = isDarkMode ? "#121212" : "#f4f4f4";
+            document.body.style.color = isDarkMode ? "white" : "black";
+        }
+
+        // Add new game
+        function addGame(title, imageUrl, url) {
+            games.push({ title, imageUrl, url, favorite: false, plays: 0, lastPlayed: null });
+            saveGames();
+            renderGames();
+        }
+
+        // Save games to localStorage
+        function saveGames() {
             localStorage.setItem("games", JSON.stringify(games));
-            loadGames();
-            closeModal();
-        } else {
-            alert("Please fill out all fields.");
         }
-    }
 
-    // Fonction pour éditer un jeu
-    function editGame(index) {
-        currentIndex = index;
-        const game = games[index];
-        document.getElementById("gameTitle").value = game.title;
-        document.getElementById("gameUrl").value = game.url;
-        document.getElementById("gameImage").value = game.image;
-        document.getElementById("modalTitle").innerText = "Edit Game";
-        openModal();
-    }
-
-    // Fonction pour supprimer un jeu
-    function deleteGame(index) {
-        games.splice(index, 1);
-        localStorage.setItem("games", JSON.stringify(games));
-        loadGames();
-    }
-
-    // Fonction pour ajouter ou supprimer des favoris
-    function toggleFavorite(index) {
-        games[index].favorite = !games[index].favorite;
-        localStorage.setItem("games", JSON.stringify(games));
-        loadGames();
-    }
-
-    // Fonction pour ouvrir le modal
-    function openModal() {
-        document.getElementById("addGameModal").style.display = "block";
-        document.getElementById("gameTitle").value = "";
-        document.getElementById("gameUrl").value = "";
-        document.getElementById("gameImage").value = "";
-        document.getElementById("modalTitle").innerText = "Add a New Game";
-        currentIndex = -1;
-    }
-
-    // Fonction pour fermer le modal
-    function closeModal() {
-        document.getElementById("addGameModal").style.display = "none";
-    }
-
-    // Fonction pour basculer entre le mode sombre et clair
-    function toggleTheme() {
-        isDarkMode = !isDarkMode;
-        if (isDarkMode) {
-            document.body.classList.remove('light-mode');
-        } else {
-            document.body.classList.add('light-mode');
+        // Load games from localStorage
+        function loadGames() {
+            games = JSON.parse(localStorage.getItem("games")) || [];
+            renderGames();
         }
-    }
 
-    // Charger les jeux lors de l'ouverture de la page
-    window.onload = loadGames;
-</script>
+        // Render game cards
+        function renderGames() {
+            const container = document.getElementById("gameContainer");
+            container.innerHTML = "";
+            games.forEach((game, index) => {
+                const gameCard = document.createElement("div");
+                gameCard.classList.add("game-card");
+                gameCard.innerHTML = `
+                    <img src="${game.imageUrl}" alt="${game.title}">
+                    <h3>${game.title}</h3>
+                    <p>Plays: ${game.plays}</p>
+                    <p>Last Played: ${game.lastPlayed ? new Date(game.lastPlayed).toLocaleString() : "Never"}</p>
+                    <button class="btn" onclick="playGame(${index})">Play</button>
+                    <button class="btn" onclick="toggleFavorite(${index})">
+                        ${game.favorite ? "Unfavorite" : "Favorite"}
+                    </button>
+                    <button class="btn" onclick="deleteGame(${index})">Delete</button>
+                `;
+                container.appendChild(gameCard);
+            });
+        }
 
+        // Play a game
+        function playGame(index) {
+            const game = games[index];
+            game.plays += 1;
+            game.lastPlayed = new Date().toISOString();
+            saveGames();
+            renderGames();
+            window.open(game.url);
+        }
+
+        // Delete a game
+        function deleteGame(index) {
+            games.splice(index, 1);
+            saveGames();
+            renderGames();
+        }
+
+        // Clear all games
+        function clearAllGames() {
+            if (confirm("Are you sure you want to clear all games?")) {
+                games = [];
+                saveGames();
+                renderGames();
+            }
+        }
+
+        // Toggle favorite
+        function toggleFavorite(index) {
+            games[index].favorite = !games[index].favorite;
+            saveGames();
+            renderGames();
+        }
+
+        // Search games
+        function searchGames() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            const filteredGames = games.filter(game => game.title.toLowerCase().includes(query));
+            const container = document.getElementById("gameContainer");
+            container.innerHTML = "";
+            filteredGames.forEach((game, index) => {
+                const gameCard = document.createElement("div");
+                gameCard.classList.add("game-card");
+                gameCard.innerHTML = `
+                    <img src="${game.imageUrl}" alt="${game.title}">
+                    <h3>${game.title}</h3>
+                    <p>Plays: ${game.plays}</p>
+                    <p>Last Played: ${game.lastPlayed ? new Date(game.lastPlayed).toLocaleString() : "Never"}</p>
+                    <button class="btn" onclick="playGame(${index})">Play</button>
+                    <button class="btn" onclick="toggleFavorite(${index})">
+                        ${game.favorite ? "Unfavorite" : "Favorite"}
+                    </button>
+                    <button class="btn" onclick="deleteGame(${index})">Delete</button>
+                `;
+                container.appendChild(gameCard);
+            });
+        }
+
+        // Show statistics
+        function showStats() {
+            const totalGames = games.length;
+            const totalPlays = games.reduce((sum, game) => sum + game.plays, 0);
+            alert(`Total Games: ${totalGames}\nTotal Plays: ${totalPlays}`);
+        }
+
+        // Initial load
+        loadGames();
+        loadSettings();
+    </script>
 </body>
 </html>
